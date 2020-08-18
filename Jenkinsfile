@@ -13,12 +13,6 @@ pipeline {
             sh 'ls'
             }  
         }
-        
-        stage('Run') {
-            steps {
-               sh 'ls'
-            }  
-        }
         stage('test') {
             steps {
                 echo 'testing the application'
