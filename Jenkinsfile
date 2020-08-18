@@ -1,12 +1,16 @@
+node {
+    def installed = fileExists 'bin/activate'
+    if(!installed) {
+        stage("Installing Python Environment") {
+            sh 'virtualenv --no-sit-packages .'
+        }
+    }
 pipeline {
     agent any 
     stages {
         stage('build') {
             steps {
-               // sh 'sudo apt-get install python3-pip'
-                sh 'pip3 install virtualenv'
-                sh  'virtualenv venv'  
-                sh   'source venv/bin/activate'
+               echo 'building'
             }  
         }
         stage('test') {
