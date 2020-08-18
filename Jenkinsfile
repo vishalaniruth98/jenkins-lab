@@ -3,7 +3,9 @@ pipeline {
     stages {
         stage('build') {
             steps {
-                echo 'building the application'
+                sh 'pip install virtualenv'
+                sh 'virtualenv venv'
+                sh 'source venv/bin/activate'
             }  
         }
         stage('test') {
