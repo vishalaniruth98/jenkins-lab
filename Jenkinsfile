@@ -4,7 +4,10 @@ pipeline {
     stages {
         stage('build') {
             steps {
-               echo 'building'
+               sh '''
+               virtualenv venv
+               source venv/bin/activate
+               '''
             }  
         }
         stage('test') {
