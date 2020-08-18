@@ -10,7 +10,7 @@ pipeline {
         
         stage('Run') {
             steps {
-               sh 'python3 calci.py'
+               sh 'ls'
             }  
         }
         stage('test') {
