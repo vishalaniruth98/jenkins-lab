@@ -4,11 +4,7 @@ pipeline {
     stages {
         stage('build') {
             steps {
-               sh '''
-               pip3 install venv
-               venv --no-site-packages
-               source bin/activate
-               '''
+              echo 'hi'
             }  
         }
         
