@@ -5,8 +5,8 @@ pipeline {
         stage('build') {
             steps {
                sh '''
-               pip3 install virtualenv
-               virtualenv --no-site-packages
+               pip3 install venv
+               venv --no-site-packages
                source bin/activate
                '''
             }  
