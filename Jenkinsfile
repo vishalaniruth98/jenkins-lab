@@ -6,9 +6,15 @@ pipeline {
             steps {
                sh '''
                pip3 install virtualenv
-               virtualenv venv
-               source venv/bin/activate
+               virtualenv --no-site-packages
+               source bin/activate
                '''
+            }  
+        }
+        
+        stage('Run') {
+            steps {
+               sh 'python3 calci.py'
             }  
         }
         stage('test') {
