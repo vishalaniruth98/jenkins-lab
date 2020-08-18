@@ -1,12 +1,5 @@
 
 pipeline {
-    node {
-    def installed = fileExists 'bin/activate'
-    if(!installed) {
-        stage("Installing Python Environment") {
-            sh 'virtualenv --no-sit-packages .'
-        }
-    }
     agent any 
     stages {
         stage('build') {
