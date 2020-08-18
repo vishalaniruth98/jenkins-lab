@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('build') {
             steps {
-                sh 'sudo apt-get install python3-pip'
+               // sh 'sudo apt-get install python3-pip'
                 sh 'pip3 install virtualenv'
                 sh 'virtualenv venv'
                 sh 'source venv/bin/activate'
