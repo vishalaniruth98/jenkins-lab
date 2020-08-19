@@ -62,9 +62,9 @@ pipeline {
                 sh 'ssh ubuntu@18.207.210.185 ls -la'
                 sh 'ssh ubuntu@18.207.210.185 touch temp_deploy/python-virtual-env-pipeline/app/history.txt'
                 echo 'Running test application..'
-                sh """
-                    ssh ubuntu@18.207.210.185 python3 temp_deploy/python-virtual-env-pipeline/app/test_in_remote_calculator.py"""
+                sh 'ssh ubuntu@18.207.210.185 python3 temp_deploy/python-virtual-env-pipeline/app/test_in_remote_calculator.py'
                //      /ssh ubuntu@18.207.210.185 python3 calci.py/"""  
             }
+        }   
         }
     }
