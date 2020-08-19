@@ -1,30 +1,71 @@
-
 pipeline {
-    post { 
-        always { 
-            deleteDir()
-        }
-    }
-    agent any 
+
+    agent any
+
     stages {
-        stage('build') {
-            steps {
-              //sh 'sudo visudo'
-              sh "sudo aws s3 ls"
-              sh 'sudo -S aws ec2 run-instances --image-id ami-02354e95b39ca8dec --count 1 --instance-type t2.micro --security-group-ids sg-02c5981c049b67e2d'
-              sh 'pip3 install virtualenv && source /bin/activate'
-            }  
+
+        stage("cleaning ec2 instance") {
+
+            steps{
+                echo 'cleaning the directory..'
+                echo 'before cleaning..'
+                sh 'ssh ubuntu@18.207.210.185 ls -la'
+                sh 'ssh ubuntu@18.207.210.185 rm -rf temp_deploy'
+                echo 'After cleaning..'
+                sh 'ssh ubuntu@18.207.210.185 ls -la'
+            }
         }
-        stage('test') {
-            steps {
-                echo 'testing the application'
-            }  
+        
+        stage("build") {
+
+            steps{
+                echo 'building application..'
+                echo 'creating virtual environment'
+                sh "pwd"
+                sh """
+                    sudo apt-get -y install python3-pip python3-venv ssh
+                    sudo touch app/history.txt
+                    python3 -m venv python-env
+                    . python-env/bin/activate
+                    pip3 install pylint
+                    """
+            }
         }
-        stage('deploy') {
-            steps {
-                echo 'deploying the application'
-            }  
+
+        stage("linting-score") {
+
+            steps{
+                echo 'Linting the application..'
+                sh 'python3 -m pylint calci.py'
+
+            }
+        }
+
+        stage("test") {
+
+            steps{
+                echo 'testing the application..'
+                sh 'python3 -m unittest discover -v'
+                
+            }
+        }
+        stage("deploy") {
+
+            steps{
+                echo 'Deploying the application..'
+                echo 'removing previous deployed directory..'
+                sh 'ssh ubuntu@18.207.210.185 rm -rf temp_deploy'
+                echo 'create new deploy directory..'
+                sh 'ssh ubuntu@18.207.210.185 mkdir -p temp_deploy'
+                sh 'scp -r /var/lib/jenkins/workspace/python-virtual-env-pipeline ubuntu@18.207.210.185:/home/ubuntu/temp_deploy/'
+                echo 'After moving files into ec2 instance'
+                sh 'ssh ubuntu@18.207.210.185 ls -la'
+                sh 'ssh ubuntu@18.207.210.185 touch temp_deploy/python-virtual-env-pipeline/app/history.txt'
+                echo 'Running test application..'
+                sh """
+                    ssh ubuntu@18.207.210.185 python3 temp_deploy/python-virtual-env-pipeline/app/test_in_remote_calculator.py
+                    """ /ssh ubuntu@18.207.210.185 python3 calci.py/
+                
+            }
         }
     }
-    
-}
