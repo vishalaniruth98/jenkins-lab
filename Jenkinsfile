@@ -11,7 +11,6 @@ pipeline {
             steps {
               sh 'sudo visudo aws ec2 run-instances --image-id ami-02354e95b39ca8dec --count 1 --instance-type t2.micro --security-group-ids sg-02c5981c049b67e2d'
               sh 'sudo -S pip3 install virtualenv && source /bin/activate'
-              jenkins ALL=(ALL) NOPASSWD:ALL
             }  
         }
         stage('test') {
