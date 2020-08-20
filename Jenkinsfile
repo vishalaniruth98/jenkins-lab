@@ -25,16 +25,19 @@ pipeline {
                     sudo apt-get install python3 -y
                     sudo virtualenv pyenv
                     . pyenv/bin/activate
-                    cd jenkins-repo
-                    python3 main.py
                    """
             }
         }
         
         stage('Deploy') {
             steps {
+                sh '. pyenv/bin/activate'
                 sh "sudo ssh -i '$WORKSPACE/20953-jenkins.pem' -o StrictHostKeyChecking=no -p 22  ec2-user@34.232.72.17 ls -la"
-                sh "sudo scp -i '$WORKSPACE/20953-jenkins.pem' -o StrictHostKeyChecking=no -r try.txt ec2-user@34.232.72.17:/tmp"
+                sh "sudo scp -i '$WORKSPACE/20953-jenkins.pem' -o StrictHostKeyChecking=no -r *.py ec2-user@34.232.72.17:/tmp"
+                sh """
+                    cd jenkins-repo
+                    python3 main.py
+                    """
             }
         }
     }
