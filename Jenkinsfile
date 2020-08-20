@@ -33,8 +33,8 @@ pipeline {
         
         stage('Deploy') {
             steps {
-                sh "sudo ssh -i '$WORKSPACE/20954-quantiphi.pem' -o StrictHostKeyChecking=no ec2-user@54.90.71.24 ls -la"
-                sh "sudo scp -i '$WORKSPACE/20954-quantiphi.pem' -o StrictHostKeyChecking=no -r try.txt ec2-user@54.90.71.24:/tmp"
+                sh "sudo ssh -i '$WORKSPACE/20954-quantiphi.pem' -o StrictHostKeyChecking=no ubuntu@ec2-54-85-43-77 ls -la"
+                sh "sudo scp -i '$WORKSPACE/20954-quantiphi.pem' -o StrictHostKeyChecking=no -r try.txt ubuntu@ec2-54-85-43-77:/tmp"
             }
         }
     }
