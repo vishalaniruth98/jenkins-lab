@@ -1,70 +1,41 @@
 pipeline {
-
     agent any
 
     stages {
-
-        stage("cleaning ec2 instance") {
-
-            steps{
-                echo 'cleaning the directory..'
-                echo 'before cleaning..'
-                sh 'ssh ubuntu@54.85.43.77 ls -la'
-                sh 'ssh ubuntu@54.85.43.77 rm -rf temp_deploy'
-                echo 'After cleaning..'
-                sh 'ssh ubuntu@54.85.43.77 ls -la'
+        stage('Clean up'){
+            steps {
+                sh "rm -rf jenkins-repo"
+                sh "rm -rf pyenv"
             }
         }
         
-        stage("build") {
-
-            steps{
-                echo 'building application..'
-                echo 'creating virtual environment'
-                sh "pwd"
+        stage('Check out SCM') {
+            steps {
                 sh """
-                    sudo apt-get -y install python3-pip python3-venv ssh
-                    sudo touch app/history.txt
-                    python3 -m venv python-env
-                    . python-env/bin/activate
-                    pip3 install pylint
-                    """
+                sudo yum update -y
+                sudo yum install git -y
+                git clone https://github.com/ragavi9798/jenkins-repo.git
+                """
             }
         }
-
-        stage("linting-score") {
-
-            steps{
-                echo 'Linting the application..'
-                sh 'python3 -m pylint calci.py'
-
+        
+        stage('Build') {
+            steps {
+                sh """
+                    sudo yum install python3 -y
+                    python3 -m venv pyenv
+                    . pyenv/bin/activate
+                    cd jenkins-repo
+                    python3 test_emp.py
+                   """
             }
         }
-
-        stage("test") {
-
-            steps{
-                echo 'testing the application..'
-                sh 'python3 -m unittest discover -v'
-                
+        
+        stage('Deploy') {
+            steps {
+                sh "sudo ssh -i '$WORKSPACE/20954-quantiphi.pem' -o StrictHostKeyChecking=no ec2-user@54.90.71.24 ls -la"
+                sh "sudo scp -i '$WORKSPACE/20954-quantiphi.pem' -o StrictHostKeyChecking=no -r try.txt ec2-user@54.90.71.24:/tmp"
             }
-        }
-        stage("deploy") {
-
-            steps{
-                echo 'Deploying the application..'
-                echo 'removing previous deployed directory..'
-                sh 'ssh ubuntu@54.85.43.77 rm -rf temp_deploy'
-                echo 'create new deploy directory..'
-                sh 'ssh ubuntu@54.85.43.77 mkdir -p temp_deploy'
-                sh 'scp -r /var/lib/jenkins/workspace/python-virtual-env-pipeline ubuntu@54.85.43.77:/home/ubuntu/temp_deploy/'
-                echo 'After moving files into ec2 instance'
-                sh 'ssh ubuntu@54.85.43.77 ls -la'
-                sh 'ssh ubuntu@54.85.43.77 touch temp_deploy/python-virtual-env-pipeline/app/history.txt'
-                echo 'Running test application..'
-                sh 'ssh ubuntu@54.85.43.77 python3 temp_deploy/python-virtual-env-pipeline/app/test_in_remote_calculator.py'
-               //      /ssh ubuntu@18.207.210.185 python3 calci.py/"""  
-            }
-        }   
         }
     }
+}
