@@ -5,16 +5,16 @@ pipeline {
         stage('Clean up'){
             steps {
                 sh "rm -rf jenkins-repo"
-                sh "rm -rf pyenv"
+                sh "rm -rf venv"
             }
         }
         
         stage('Check out SCM') {
             steps {
                 sh """
-                sudo yum update -y
-                sudo yum install git -y
-                git clone https://github.com/ragavi9798/jenkins-repo.git
+                sudo apt-get update -y
+                sudo apt-get install git -y
+                git clone https://github.com/vishalaniruth98/jenkins-repo.git
                 """
             }
         }
@@ -22,19 +22,19 @@ pipeline {
         stage('Build') {
             steps {
                 sh """
-                    sudo yum install python3 -y
-                    python3 -m venv pyenv
+                    sudo apt-get install python3 -y
+                    sudo virtualenv pyenv
                     . pyenv/bin/activate
                     cd jenkins-repo
-                    python3 test_emp.py
+                    python3 main.py
                    """
             }
         }
         
         stage('Deploy') {
             steps {
-                sh "sudo ssh -i '$WORKSPACE/20954-quantiphi.pem' -o StrictHostKeyChecking=no ubuntu@ec2-54-85-43-77 ls -la"
-                sh "sudo scp -i '$WORKSPACE/20954-quantiphi.pem' -o StrictHostKeyChecking=no -r try.txt ubuntu@ec2-54-85-43-77:/tmp"
+                sh "sudo ssh -i '$WORKSPACE/20953-jenkins.pem' -o StrictHostKeyChecking=no -p 22  ec2-user@34.232.72.17 ls -la"
+                sh "sudo scp -i '$WORKSPACE/20953-jenkins.pem' -o StrictHostKeyChecking=no -r try.txt ec2-user@34.232.72.17:/tmp"
             }
         }
     }
